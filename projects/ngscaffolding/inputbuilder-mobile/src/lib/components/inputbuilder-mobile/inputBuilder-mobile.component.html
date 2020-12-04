@@ -1,0 +1,191 @@
+<form
+    novalidate
+    *ngIf="(formRendered$ | async) && formBuilt && inputBuilderDefinition && filteredInputDetails"
+    (ngSubmit)="onSubmit(form)"
+    [formGroup]="form"
+>
+    <ion-list>
+        <ng-container  *ngFor="let input of filteredInputDetails">
+            <ng-container [ngSwitch]="input.type">
+                <!-- null === Blank -->
+                <span *ngSwitchCase="'null'"> </span>
+
+                <!-- textbox -->
+                <ion-item *ngSwitchCase="'textbox'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-input
+                        [name]="input.name"
+                        
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-input>
+                </ion-item>
+
+                <!-- password -->
+                <ion-item *ngSwitchCase="'password'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-input
+                        [name]="input.name"
+                        [type]="showPassword ? 'text' : 'password'"
+                        
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-input>
+                    <ion-icon slot="end" [name]="passwordToggleIcon" (click)="togglePassword()"></ion-icon>
+                </ion-item>
+
+                <!-- email -->
+                <ion-item *ngSwitchCase="'email'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-input
+                        [name]="input.name"
+                        type="email"
+                        
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-input>
+                </ion-item>
+
+                <!-- TextArea -->
+                <ion-item *ngSwitchCase="'textarea'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-textarea
+                        [rows]="input.rows"
+                        [placeholder]="input.label"
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-textarea>
+                </ion-item>
+
+                <!-- Checkbox -->
+                <ion-item *ngSwitchCase="'checkbox'">
+                    <ion-label>{{ getLabel(input) | translate }}</ion-label>
+                    <ion-checkbox slot="end" [formControlName]="input.name" [id]="input.name"></ion-checkbox>
+                </ion-item>
+
+                <!-- Simple DropDown -->
+                <ion-item *ngSwitchCase="'dropdown'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+
+                    <ion-select [formControlName]="input.name" [id]="input.name" interface="action-sheet">
+                        <ion-select-option *ngFor="let option of dataSourceLookup[input.name]" [value]="option.value"
+                            >{{ option.display }}
+                        </ion-select-option>
+                    </ion-select>
+                </ion-item>
+
+                <!-- InputSwitch -->
+                <ion-item *ngSwitchCase="'switch'">
+                        <ion-label>{{ getLabel(input) | translate }}</ion-label>
+                        <ion-toggle [formControlName]="input.name" [id]="input.name"></ion-toggle>
+                </ion-item>
+
+                <!-- DateTime -->
+                <ion-item *ngSwitchCase="'datetime'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-datetime
+                        displayFormat="D MMM YYYY H:mm"
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-datetime>
+                </ion-item>
+
+                <!-- Date -->
+                <ion-item *ngSwitchCase="'date'">
+                    <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-datetime
+                        displayFormat="H:mm"
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-datetime>
+                </ion-item>
+
+                <!-- Time -->
+                <ion-item *ngSwitchCase="'time'">
+                      <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-datetime
+                        displayFormat="H:mm"
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-datetime>
+                </ion-item>
+
+                <!-- DEFUALT textbox -->
+                <ion-item *ngSwitchDefault>
+                      <ion-label position="floating">{{ getLabel(input) | translate }}</ion-label>
+                    <ion-input
+                        [name]="input.name"
+                        
+                        [formControlName]="input.name"
+                        [id]="input.name"
+                    ></ion-input>
+                </ion-item>
+            </ng-container>
+
+            <!-- Help text here -->
+            <span *ngIf="input.help" class="p-col-1">
+                <i class="fa ui-icon-info helpIcon"  tooltipPosition="bottom"></i>
+            </span>
+
+            <div
+                class="ui-message ui-messages-error ui-corner-all"
+                *ngIf="
+                    form.get(input.name)?.invalid &&
+                    (form.get(input.name)?.dirty || form.get(input.name)?.touched || formSubmitted)
+                "
+            >
+                <div *ngIf="form.get(input.name).errors.required">
+                    {{ input.validateRequired }}
+                </div>
+                <div *ngIf="form.get(input.name).errors.requiredTrue">
+                    {{ input.validateRequiredTrue }}
+                </div>
+                <div *ngIf="form.get(input.name).errors.email">
+                    {{ input.validateEmail }}
+                </div>
+                <div *ngIf="form.get(input.name).errors.pattern">
+                    {{ input.validatePatternMessage }}
+                </div>
+                <div *ngIf="form.get(input.name).errors.minlength">
+                    {{ input.validateMinLengthMessage }}
+                </div>
+                <div *ngIf="form.get(input.name).errors.maxlength">
+                    {{ input.validateMaxLengthMessage }}
+                </div>
+            </div>
+        </ng-container>
+    </ion-list>
+    <div
+        class="button-line"
+        class="p-col-12"
+        *ngIf="
+            inputBuilderDefinition.customButtonText ||
+            inputBuilderDefinition.cancelButtonText ||
+            inputBuilderDefinition.okButtonText
+        "
+    >
+        <div class="button-container p-col-3" *ngIf="inputBuilderDefinition.customButtonText">
+            <button
+                type="button"
+                (click)="onCustom()"
+                class="p-button-info"
+                iconPos="left"
+            ></button>
+        </div>
+        <div class="button-container p-col-3" *ngIf="inputBuilderDefinition.cancelButtonText">
+            <button
+                type="button"
+                (click)="onCancel()"
+                class="p-button-warning"
+                iconPos="left"
+            ></button>
+        </div>
+        <div class="button-container p-col-3" *ngIf="inputBuilderDefinition.okButtonText">
+            <button
+                type="submit"
+                class="p-button-success"
+                iconPos="left"
+            ></button>
+        </div>
+    </div>
+</form>

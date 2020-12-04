@@ -1,0 +1,17 @@
+{
+  "name": "@ngscaffolding/inputbuilder-mobile",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^9.1.4",
+    "@angular/core": "^9.1.4",
+    "@angular/forms": "^9.1.4",
+    "@ngscaffolding/models": "^1.0.0",
+    "@ngscaffolding/core": "^1.0.0",
+    "@ngx-translate/core": "^11.0.1",
+    "@ionic/angular": "^5.1.0",
+    "rxjs": "^6.5.5"
+  },
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}
